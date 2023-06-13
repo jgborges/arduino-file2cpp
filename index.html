@@ -1,7 +1,7 @@
 <html>
   <head>
   </head>
-  <body>
+  <body onload="init()">
     <h1>Embed Files in Arduino Source Code</h1>
     <h2>1. Select file</h2>
     <div>All processing is done locally in your browser; your images are not uploaded or stored anywhere online.</div>
@@ -11,27 +11,19 @@
     <input type="textarea" id="cpp-output" name="cpp-output" /><br/>
   </body>
   <script>
-    function handleFileSelect(evt) {
-      let files = evt.target.files; // FileList object
-  
-      // use the 1st file from the list
-      let f = files[0];
-      
-      let reader = new FileReader();
-  
-      // Closure to capture the file information.
-      reader.onload = (function(theFile) {
-        return function(e) {
-          jQuery( '#ms_word_filtered_html' ).val( e.target.result );
-        };
-      })(f);
-
-      // Read in the image file as a data URL.
-      const data = reader.readAsText(f);
-
-      document.getElementyById('cpp-output').value = data;
+    function init() {
+      document.getElementById('file-input').addEventListener('change', handleFileSelect, false);
     }
-  
-    document.getElementById('file-input').addEventListener('change', handleFileSelect, false);
+    
+    function handleFileSelect(event) {
+      const reader = new FileReader()
+      reader.onload = handleFileLoad;
+      reader.readAsText(event.target.files[0])
+    }
+    
+    function handleFileLoad(event) {
+      console.log(event);
+      document.getElementById('cpp-output').value = event.target.result;
+    }
   </script>
 </html>
