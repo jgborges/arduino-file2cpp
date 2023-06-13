@@ -3,33 +3,33 @@
   </head>
   <body>
     <h1>Embed Files in Arduino Source Code</h1>
-    <section class="section bottom-divider">
-      <section class="sub-section">
-        <div class="column" id="file-input-column">
-          <h2 class="sub-section-title">1. Select image</h2>
-          <div class="note upload-note">All processing is done locally in your browser; your images are not uploaded or stored anywhere online.</div>
-          <input type="file" id="file-input" name="file-input" multiple/><br />
-        </div>
-        <div class="column column-center">
-          <h2 class="sub-section-title">or</h2>
-        </div>
-        <div class="column column-right">
-          <h2 class="sub-section-title">1. Paste byte array</h2>
-          <textarea id="byte-input" class="byte-input"></textarea><br />
-          <div class="text-input-size">
-            <input type="number" min="0" id="text-input-width" class="size-input" value="128" /> x
-            <input type="number" min="0" id="text-input-height" class="size-input" value="64" /> px
-          </div>
-          <div>
-            <button onclick="handleTextInput('horizontal')">Read as horizontal</button>
-            <button onclick="handleTextInput('vertical')">Read as vertical</button>
-          </div>
-          <div class="note">Read images appear at step 3 below</div>
-        </div>
-      </section>
-    </section>
+    <h2>1. Select file</h2>
+    <div>All processing is done locally in your browser; your images are not uploaded or stored anywhere online.</div>
+    <input type="file" id="file-input" name="file-input" multiple /><br/>
+    <div><button onclick="handleTextInput('horizontal')">Convert</button></div>
+    <h2>2. Copy the cpp copde to your Arduino sketch</h2>
+    <input type="textarea" id="cpp-output" name="cpp-output" /><br/>
   </body>
   <script>
-    
+    function handleFileSelect(evt) {
+      let files = evt.target.files; // FileList object
+  
+      // use the 1st file from the list
+      let f = files[0];
+      
+      let reader = new FileReader();
+  
+      // Closure to capture the file information.
+      reader.onload = (function(theFile) {
+        return function(e) {
+          jQuery( '#ms_word_filtered_html' ).val( e.target.result );
+        };
+      })(f);
+
+      // Read in the image file as a data URL.
+      reader.readAsText(f);
+    }
+  
+    document.getElementById('file-input').addEventListener('change', handleFileSelect, false);
   </script>
 </html>
