@@ -23,7 +23,17 @@
     
     function handleFileLoad(event) {
       console.log(event);
-      document.getElementById('cpp-output').value = event.target.result;
+      document.getElementById('cpp-output').value = rawToHex(event.target.result);
     }
+
+    function rawToHex(content) {
+      var output = "";
+      for (const c in a) {
+        //const c = a.charCodeAt(i);
+        var d = "00"+c.toString(16);
+        var e = d.substr(d.length-2);
+        output += '0x' + e + ',';
+      }
+      return output;
   </script>
 </html>
