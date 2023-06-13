@@ -27,7 +27,9 @@
       })(f);
 
       // Read in the image file as a data URL.
-      reader.readAsText(f);
+      const data = reader.readAsText(f);
+
+      document.getElementyById('cpp-output').value = data;
     }
   
     document.getElementById('file-input').addEventListener('change', handleFileSelect, false);
