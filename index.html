@@ -8,20 +8,23 @@
     <input type="file" id="file-input" name="file-input" multiple /><br/>
     <!--<div><button onclick="handleTextInput('horizontal')">Convert</button></div>-->
     <h2>2. Copy the cpp copde to your Arduino sketch</h2>
-    <input type="textarea" id="cpp-output" name="cpp-output" rows="60" cols="50" /><br/>
+    <textarea id="cpp-output" name="cpp-output" rows="60" cols="180" style="font-family: monospace; font-size: small"></textarea><br/>
   </body>
   <script>
     function init() {
       document.getElementById('file-input').addEventListener('change', handleFileSelect, false);
     }
     
-    function handleFileSelect(event) {
+    async function handleFileSelect(event) {
       var output = '';
-      for (const file in event.target.files) {
+      for (const file of event.target.files) {
+        output += `\\\\ ${file.name} (${file.type})\n`
         const varName = getCppVariable(file.name);
         output += `const unsigned char ${varName}[] = {\n`;
-        rawToHex(read(file))
+        output += rawToHex(await read(file))
+          .join(',')
           .match(/.{1,175}/g) // 35 chars are coded as 175 chars, as each char is coded as 5 hex chars (i.e. '0xAB,') 
+          .map(line => `  ${line}`)
           .join('\n');
         output += "\n};\n\n";
       }
@@ -36,32 +39,23 @@
       Names cannot contain whitespaces or special characters like !, #, %, etc.
       Reserved words (like C++ keywords, such as int) cannot be used as names
       */
-      const name = filename.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+      const name = filename.replace(/[.\s]/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
       const startsWithNumber = /^\d/.test(name);
       
       return (startsWithNumber ? '_' : '') + name;
     }
 
     async function read(file) {
-      // Read the file as text
-      console.log(await file.text())
       // Read the file as ArrayBuffer to handle binary data
-      console.log(new Uint8Array(await file.arrayBuffer()))
-      // Abuse response to read json data
-      console.log(await new Response(file).json())
-      // Read large data chunk by chunk
-      console.log(file.stream())
+      return new Uint8Array(await file.arrayBuffer());
     }
 
-    function rawToHex(content) {
-      var output = "";
-      for (const c in a) {
-        //const c = a.charCodeAt(i);
+    function rawToHex(buffer) {
+      return [...buffer].map(c => {
         var d = "00"+c.toString(16);
         var e = d.substr(d.length-2);
-        output += '0x' + e + ',';
-      }
-      return output;
+        return '0x' + e;
+      });
     }
   </script>
 </html>
