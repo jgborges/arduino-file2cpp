@@ -6,9 +6,9 @@
     <h2>1. Select file</h2>
     <div>All processing is done locally in your browser; your images are not uploaded or stored anywhere online.</div>
     <input type="file" id="file-input" name="file-input" multiple /><br/>
-    <div><button onclick="handleTextInput('horizontal')">Convert</button></div>
+    <!--<div><button onclick="handleTextInput('horizontal')">Convert</button></div>-->
     <h2>2. Copy the cpp copde to your Arduino sketch</h2>
-    <input type="textarea" id="cpp-output" name="cpp-output" rows="4" cols="50" /><br/>
+    <input type="textarea" id="cpp-output" name="cpp-output" rows="60" cols="50" /><br/>
   </body>
   <script>
     function init() {
@@ -16,14 +16,41 @@
     }
     
     function handleFileSelect(event) {
-      const reader = new FileReader()
-      reader.onload = handleFileLoad;
-      reader.readAsText(event.target.files[0])
+      var output = '';
+      for (const file in event.target.files) {
+        const varName = getCppVariable(file.name);
+        output += `const unsigned char ${varName}[] = {\n`;
+        rawToHex(read(file))
+          .match(/.{1,175}/g) // 35 chars are coded as 175 chars, as each char is coded as 5 hex chars (i.e. '0xAB,') 
+          .join('\n');
+        output += "\n};\n\n";
+      }
+      document.getElementById('cpp-output').value = output;
     }
-    
-    function handleFileLoad(event) {
-      console.log(event);
-      document.getElementById('cpp-output').value = rawToHex(event.target.result);
+
+    function getCppVariable(filename) {
+      /*
+      Names can contain letters, digits and underscores
+      Names must begin with a letter or an underscore (_)
+      Names are case sensitive (myVar and myvar are different variables)
+      Names cannot contain whitespaces or special characters like !, #, %, etc.
+      Reserved words (like C++ keywords, such as int) cannot be used as names
+      */
+      const name = filename.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+      const startsWithNumber = /^\d/.test(name);
+      
+      return (startsWithNumber ? '_' : '') + name;
+    }
+
+    async function read(file) {
+      // Read the file as text
+      console.log(await file.text())
+      // Read the file as ArrayBuffer to handle binary data
+      console.log(new Uint8Array(await file.arrayBuffer()))
+      // Abuse response to read json data
+      console.log(await new Response(file).json())
+      // Read large data chunk by chunk
+      console.log(file.stream())
     }
 
     function rawToHex(content) {
@@ -35,5 +62,6 @@
         output += '0x' + e + ',';
       }
       return output;
+    }
   </script>
 </html>
