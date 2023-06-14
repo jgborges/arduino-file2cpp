@@ -19,9 +19,9 @@
     async function handleFileSelect(event) {
       var output = '';
       for (const file of event.target.files) {
-        output += `\\\\ ${file.name} (${file.type})\n`
+        output += `// ${file.name} (${file.type})\n`
         const varName = getCppVariable(file.name);
-        output += `const unsigned char ${varName}[] = {\n`;
+        output += `const unsigned char ${varName}[] PROGMEM = {\n`;
         output += rawToHex(await read(file))
           .join(',')
           .match(/.{1,175}/g) // 35 chars are coded as 175 chars, as each char is coded as 5 hex chars (i.e. '0xAB,') 
