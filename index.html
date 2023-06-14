@@ -8,7 +8,8 @@
     <input type="file" id="file-input" name="file-input" multiple /><br/>
     <!--<div><button onclick="handleTextInput('horizontal')">Convert</button></div>-->
     <h2>2. Copy the cpp copde to your Arduino sketch</h2>
-    <textarea id="cpp-output" name="cpp-output" rows="60" cols="180" style="font-family: monospace; font-size: small"></textarea><br/>
+    <textarea id="cpp-output" name="cpp-output" rows="40" cols="180" style="font-family: monospace; font-size: small"></textarea><br/>
+    <button onclick="copyToClipboard()">Copy Text</button>
   </body>
   <script>
     function init() {
@@ -56,6 +57,18 @@
         var e = d.substr(d.length-2);
         return '0x' + e;
       });
+    }
+
+    function copyToClipboard() {
+      // Get the text field
+      var copyText = document.getElementById("cpp-output");
+
+      // Select the text field
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); // For mobile devices
+
+      // Copy the text inside the text field
+      navigator.clipboard.writeText(copyText.value);
     }
   </script>
 </html>
