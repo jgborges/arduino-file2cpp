@@ -61,7 +61,7 @@
 
     function copyToClipboard() {
       // Get the text field
-      const copyText = document.getElementById("cpp-output")?.value | "";
+      const copyText = document.getElementById("cpp-output")?.value + "";
 
       // Copy the text to the clipboard
       navigator.clipboard.writeText(copyText);
